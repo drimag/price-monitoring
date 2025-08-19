@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { REGIONS, CHANNELS } from "../constants"
 import "./PriceMonitor.css";
 
 import Header from "../components/dashboard/Header";
@@ -9,6 +10,26 @@ import ChartPanel from "../components/dashboard/ChartPanel";
 import SummaryTable from "../components/dashboard/SummaryTable";
 
 function PriceMonitor() {
+  const [filters, setFilters] = useState({
+    search: "",
+    regions: new Set(REGIONS),
+    channels: new Set(CHANNELS),
+  });
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (filters.search) params.append("search", filters.search);
+    filters.regions.forEach((r) => params.append("regions", r));
+    filters.channels.forEach((c) => params.append("channels", c));
+
+    fetch(`/api/summary?${params.toString()}`)
+      .then((res) => res.json())
+      .then(setData)
+      .catch((err) => console.error("Error fetching summary:", err));
+  }, [filters]);
+
   return (
     <>
       <Header />
@@ -16,7 +37,7 @@ function PriceMonitor() {
       <main className="wrap main-layout">
         {/* TOP HALF */}
         <div className="top-half">
-          <FiltersPanel />
+          <FiltersPanel filters={filters} setFilters={setFilters}/>
 
           <section className="right-content">
             <KpiCards />
@@ -27,7 +48,7 @@ function PriceMonitor() {
 
         {/* BOTTOM HALF */}
         <div className="bottom-half">
-          <SummaryTable />
+          <SummaryTable rows={data}/>
         </div>
       </main>
     </>
