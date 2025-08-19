@@ -1,3 +1,5 @@
+import "./KpiCards.css";
+
 export default function KpiCards() {
   return (
     <div className="cards">

@@ -1,0 +1,4 @@
+.toolbar{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.seg{ display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+.seg button{ border:0; padding:8px 12px; background:#0c1229; color:var(--muted); cursor:pointer; }
+.seg button.active{ background:#1a2761; color:var(--text); }

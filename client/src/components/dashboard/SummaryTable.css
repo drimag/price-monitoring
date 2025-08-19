@@ -1,0 +1,15 @@
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:16px; }
+table{ width:100%; border-collapse:separate; border-spacing:0; min-width:800px; }
+thead th{ position:sticky; top:0; background:#0c1229; border-bottom:1px solid var(--border); color:var(--muted); font-weight:600; font-size:12px; text-align:left; padding:10px; }
+tbody td{ border-bottom:1px solid #1a2450; padding:10px; font-size:14px; }
+tbody tr:hover{ background:#0f1431; }
+th.sortable{ cursor:pointer; }
+th.sortable .caret{ opacity:.5; margin-left:4px; }
+
+.kpi{ font-variant-numeric: tabular-nums; }
+
+/* Status (last col) */
+.badge{ padding:4px 8px; border-radius:999px; font-size:12px; font-weight:600; display:inline-flex; gap:6px; align-items:center; }
+.b-green{ background: rgba(31,170,135,.15); color:var(--green); border:1px solid rgba(31,170,135,.35); }
+.b-yellow{ background: rgba(230,184,0,.15); color:var(--yellow); border:1px solid rgba(230,184,0,.35); }
+.b-red{ background: rgba(239,83,80,.15); color:var(--red); border:1px solid rgba(239,83,80,.35); }

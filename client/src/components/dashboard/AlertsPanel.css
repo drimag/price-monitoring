@@ -1,0 +1,2 @@
+.top-alerts{ display:grid; gap:8px; }
+.alert-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; background:#0d1638; border:1px solid var(--border); padding:10px 12px; border-radius:12px; }

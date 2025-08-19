@@ -1,8 +1,6 @@
 /* main */
 .main-layout { display: flex; flex-direction: column; gap: 24px;}
 .top-half { display: flex; gap: 16px; }
-/* this might need to be somewhere else */
-.filters{ flex: 0 0 300px; }
 .right-content{ flex: 1; display: flex; flex-direction: column; gap: 16px; }
 
 /* panels */
@@ -10,3 +8,6 @@
 .panel h2{ font-size:16px; margin:0 0 8px 0; color:var(--muted); letter-spacing:.3px; }
 .panel .body{ padding:16px; }
 
+/* Spacing Between Panel Headers */
+.flex{ display:flex; align-items:center; gap:8px; }
+.between{ justify-content:space-between; }

@@ -1,4 +1,5 @@
-// src/components/FiltersPanel.jsx
+import "./FiltersPanel.css";
+
 export default function FiltersPanel() {
   return (
     <aside className="panel filters" aria-label="Filter panel">
