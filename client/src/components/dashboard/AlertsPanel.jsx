@@ -1,3 +1,4 @@
+import "./AlertsPanel.css";
 export default function AlertsPanel() {
   return (
     <div className="panel">

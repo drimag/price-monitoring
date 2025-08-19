@@ -1,3 +1,4 @@
+import "./ChartPanel.css";
 export default function ChartPanel() {
   return (
     <div className="panel">

@@ -1,3 +1,5 @@
+import "./SummaryTable.css";
+
 export default function SummaryTable() {
   return (
     <div className="panel">
@@ -10,15 +12,14 @@ export default function SummaryTable() {
           <table id="summary">
             <thead>
               <tr>
-                <th>Good</th>
-                <th>Category</th>
-                <th>Region</th>
-                <th>Trade Channel</th>
-                <th>SRP</th>
-                <th>Actual Price</th>
-                <th>Difference</th>
-                <th>% Difference</th>
-                <th>Status</th>
+                <th class="sortable" data-key="good">Good <span class="caret">▾</span></th>
+                <th class="sortable" data-key="category">Category <span class="caret">▾</span></th>
+                <th class="sortable" data-key="region">Region <span class="caret">▾</span></th>
+                <th class="sortable" data-key="channel">Trade Channel <span class="caret">▾</span></th>
+                <th class="sortable" data-key="srp" data-type="num">SRP <span class="caret">▾</span></th>
+                <th class="sortable" data-key="actual" data-type="num">Actual Price <span class="caret">▾</span></th>
+                <th class="sortable" data-key="diff" data-type="num">Difference <span class="caret">▾</span></th>
+                <th class="sortable" data-key="pct" data-type="num">% Difference <span class="caret">▾</span></th>
               </tr>
             </thead>
             <tbody>
