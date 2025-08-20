@@ -1,6 +1,20 @@
 import "./SummaryTable.css";
+import {THRESH_RED, THRESH_YELLOW} from "../../constants.js"
 
 export default function SummaryTable({ rows }) {
+  function statusBadge(pct) {
+    if (pct <= 0) {
+      return <span className="badge b-green">At/Below SRP</span>;
+    }
+    if (pct < THRESH_RED && pct >= THRESH_YELLOW) {
+      return <span className="badge b-yellow">Slightly Above</span>;
+    }
+    if (pct >= THRESH_RED) {
+      return <span className="badge b-red">Significantly Above</span>;
+    }
+    return <span className="badge b-green">At/Below SRP</span>;
+  }
+
   return (
     <div className="panel">
       <div className="body">
@@ -51,11 +65,12 @@ export default function SummaryTable({ rows }) {
                     <td>{row.actual}</td>
                     <td>{row.diff}</td>
                     <td>{row.pct}%</td>
+                    <td>{statusBadge(row.pct)}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" style={{ textAlign: "center" }}>
+                  <td colSpan="9" style={{ textAlign: "center" }}>
                     No data available
                   </td>
                 </tr>

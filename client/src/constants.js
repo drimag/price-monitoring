@@ -13,3 +13,6 @@ export const CHANNELS = [
   "Wet Market",
   "Convenience Store",
 ];
+
+export const THRESH_YELLOW = 0;  
+export const THRESH_RED = 10;     

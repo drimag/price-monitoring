@@ -47,11 +47,30 @@ router.get("/", (req, res) => {
   const regionList = Array.isArray(regions) ? regions : [regions];
   results = results.filter((item) => regionList.includes(item.region));
 
-
   const channelList = Array.isArray(channels) ? channels : [channels];
   results = results.filter((item) => channelList.includes(item.channel));
 
   res.json(results);
+});
+
+router.get("/kpi", (req, res) => {
+  const totalGoods = summaryData.length;
+
+  const avgPct =
+    totalGoods > 0
+      ? summaryData.reduce((sum, item) => sum + item.pct, 0) / totalGoods
+      : 0;
+
+  const atOrBelowSRP = summaryData.filter((item) => item.pct <= 0).length;
+
+  const aboveSRP = summaryData.filter((item) => item.pct > 0).length;
+
+  res.json({
+    totalGoods,
+    avgPct,
+    atOrBelowSRP,
+    aboveSRP,
+  });
 });
 
 export default router;
