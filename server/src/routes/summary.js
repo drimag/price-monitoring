@@ -44,15 +44,12 @@ router.get("/", (req, res) => {
     results = results.filter((item) => item.good.toLowerCase().includes(term));
   }
 
-  if (regions) {
-    const regionList = Array.isArray(regions) ? regions : [regions];
-    results = results.filter((item) => regionList.includes(item.region));
-  }
+  const regionList = Array.isArray(regions) ? regions : [regions];
+  results = results.filter((item) => regionList.includes(item.region));
 
-  if (channels) {
-    const channelList = Array.isArray(channels) ? channels : [channels];
-    results = results.filter((item) => channelList.includes(item.channel));
-  }
+
+  const channelList = Array.isArray(channels) ? channels : [channels];
+  results = results.filter((item) => channelList.includes(item.channel));
 
   res.json(results);
 });
