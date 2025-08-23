@@ -73,4 +73,44 @@ router.get("/kpi", (req, res) => {
   });
 });
 
+router.get("/top-alerts", (req, res) => {
+  let results = [...summaryData];
+  const { search, regions, channels } = req.query;
+
+  // --- Apply filters ---
+  if (search) {
+    const term = search.toLowerCase();
+    results = results.filter((item) =>
+      item.good.toLowerCase().includes(term)
+    );
+  }
+  if (regions) {
+    const regionList = Array.isArray(regions) ? regions : [regions];
+    if (regionList.length > 0) {
+      results = results.filter((item) => regionList.includes(item.region));
+    }
+  }
+  if (channels) {
+    const channelList = Array.isArray(channels) ? channels : [channels];
+    if (channelList.length > 0) {
+      results = results.filter((item) => channelList.includes(item.channel));
+    }
+  }
+
+  // --- Top Alerts Logic ---
+  let aboveSRP = results.filter((item) => item.pct > 0);
+
+  aboveSRP.sort((a, b) => b.pct - a.pct);
+
+  let topAlerts = aboveSRP.slice(0, 5).map((item, idx) => ({
+    rank: idx + 1,
+    ...item,
+  }));
+
+  res.json({
+    totalAbove: aboveSRP.length,
+    topAlerts
+  });
+});
+
 export default router;

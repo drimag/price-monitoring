@@ -16,6 +16,8 @@ function PriceMonitor() {
     channels: new Set(CHANNELS),
   });
   const [data, setData] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [context, setContext] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -30,6 +32,21 @@ function PriceMonitor() {
       .catch((err) => console.error("Error fetching summary:", err));
   }, [filters]);
 
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filters.search) params.append("search", filters.search);
+    filters.regions.forEach((r) => params.append("regions", r));
+    filters.channels.forEach((c) => params.append("channels", c));
+
+    fetch(`/api/summary/top-alerts?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setAlerts(data.topAlerts || []);
+        setContext(`${data.totalAbove} items above SRP in current view`);
+      })
+      .catch((err) => console.error("Error fetching top alerts:", err));
+  }, [filters]);
+
   return (
     <>
       <Header />
@@ -41,7 +58,7 @@ function PriceMonitor() {
 
           <section className="right-content">
             <KpiCards />
-            <AlertsPanel />
+            <AlertsPanel alerts={alerts} context={context}/>
             <ChartPanel />
           </section>
         </div>

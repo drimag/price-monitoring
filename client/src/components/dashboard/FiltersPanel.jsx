@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { REGIONS, CHANNELS } from "../../constants"
 import "./FiltersPanel.css";
 
