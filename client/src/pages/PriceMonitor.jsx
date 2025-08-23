@@ -59,7 +59,7 @@ function PriceMonitor() {
           <section className="right-content">
             <KpiCards />
             <AlertsPanel alerts={alerts} context={context}/>
-            <ChartPanel />
+            <ChartPanel rows={data}/>
           </section>
         </div>
 

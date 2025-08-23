@@ -84,18 +84,11 @@ router.get("/top-alerts", (req, res) => {
       item.good.toLowerCase().includes(term)
     );
   }
-  if (regions) {
-    const regionList = Array.isArray(regions) ? regions : [regions];
-    if (regionList.length > 0) {
-      results = results.filter((item) => regionList.includes(item.region));
-    }
-  }
-  if (channels) {
-    const channelList = Array.isArray(channels) ? channels : [channels];
-    if (channelList.length > 0) {
-      results = results.filter((item) => channelList.includes(item.channel));
-    }
-  }
+  const regionList = Array.isArray(regions) ? regions : [regions];
+  results = results.filter((item) => regionList.includes(item.region));
+
+  const channelList = Array.isArray(channels) ? channels : [channels];
+  results = results.filter((item) => channelList.includes(item.channel));
 
   // --- Top Alerts Logic ---
   let aboveSRP = results.filter((item) => item.pct > 0);
