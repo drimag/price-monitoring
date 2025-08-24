@@ -11,10 +11,10 @@ export default function KpiCards() {
   });
 
   useEffect(() => {
-    fetch("/api/summary/kpi")
+    fetch("/api/goods/kpi")
       .then((res) => res.json())
       .then((data) => setKpis(data))
-      .catch((err) => console.error("Error fetching summary:", err));
+      .catch((err) => console.error("Error fetching kpi:", err));
   }, []);
 
   return (

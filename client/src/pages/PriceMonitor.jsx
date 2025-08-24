@@ -26,7 +26,7 @@ function PriceMonitor() {
     filters.regions.forEach((r) => params.append("regions", r));
     filters.channels.forEach((c) => params.append("channels", c));
 
-    fetch(`/api/summary?${params.toString()}`)
+    fetch(`/api/goods?${params.toString()}`)
       .then((res) => res.json())
       .then(setData)
       .catch((err) => console.error("Error fetching summary:", err));
@@ -38,7 +38,7 @@ function PriceMonitor() {
     filters.regions.forEach((r) => params.append("regions", r));
     filters.channels.forEach((c) => params.append("channels", c));
 
-    fetch(`/api/summary/top-alerts?${params.toString()}`)
+    fetch(`/api/goods/top-alerts?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setAlerts(data.topAlerts || []);

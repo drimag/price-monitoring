@@ -57,7 +57,7 @@ export default function SummaryTable({ rows }) {
               {rows.length > 0 ? (
                 rows.map((row, i) => (
                   <tr key={i}>
-                    <td>{row.good}</td>
+                    <td>{row.name}</td>
                     <td>{row.category}</td>
                     <td>{row.region}</td>
                     <td>{row.channel}</td>
