@@ -1,9 +1,13 @@
 import PriceMonitor from "./pages/PriceMonitor";
+import UserProfile from "./pages/UserProfile";
+import UserEntry from "./pages/UserEntry";
 
 function App() {
   return (
     <div>
-      <PriceMonitor />
+      {/* <UserProfile /> */}
+      {/* <PriceMonitor /> */}
+      <UserEntry />
     </div>
   );
 }

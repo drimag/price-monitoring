@@ -47,6 +47,12 @@ function PriceMonitor() {
       .catch((err) => console.error("Error fetching top alerts:", err));
   }, [filters]);
 
+  const user = {
+    name: "Juan Dela Cruz",
+    mobile: "0917-123-4567",
+    region: "Metro Manila",
+  };
+
   return (
     <>
       <Header />
