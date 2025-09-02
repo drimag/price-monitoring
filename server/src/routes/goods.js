@@ -1,28 +1,45 @@
 import express from "express";
-import Good from "../models/Good.js"
+import Good from "../models/Good.js";
+import PriceEntry from "../models/PriceEntry.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    const { search, regions, channels } = req.query;
-    let query = {};
+        const { search, regions, channels } = req.query;
+    const query = {};
 
-    if (search) {
-      query.good = { $regex: search, $options: "i" };
-    }
     if (regions) {
-      query.region = { $in: Array.isArray(regions) ? regions : [regions] };
+      const regionList = Array.isArray(regions) ? regions : [regions];
+      query.region = { $in: regionList };
     }
     if (channels) {
-      query.channel = { $in: Array.isArray(channels) ? channels : [channels] };
+      const channelList = Array.isArray(channels) ? channels : [channels];
+      query.channel = { $in: channelList };
     }
 
-    console.log("Mongo query:", query);
+    let entries = await PriceEntry.find(query).populate("good");
 
+    if (search) {
+      const term = search.toLowerCase();
+      entries = entries.filter(e =>
+        e.good.name.toLowerCase().includes(term)
+      );
+    }
 
-    const results = await Good.find(query).lean();
-    res.json(results);
+    const result = entries.map(e => ({
+      id: e._id,
+      name: e.good.name,
+      category: e.good.category,
+      region: e.region,
+      channel: e.channel,
+      srp: e.good.srp,
+      actual: e.actual,
+      diff: e.actual - e.good.srp,
+      pct: ((e.actual - e.good.srp) / e.good.srp) * 100,
+    }));
+
+    res.json(result);
   } catch (err) {
     console.error("Error fetching goods:", err);
     res.status(500).json({ error: "Failed to fetch goods" });
@@ -31,16 +48,17 @@ router.get("/", async (req, res) => {
 
 router.get("/kpi", async (req, res) => {
   try {
-    const goods = await Good.find();
-    const totalGoods = goods.length;
+    const entries = await PriceEntry.find().populate("good");
+    const totalGoods = entries.length;
 
-    const avgPct =
-      totalGoods > 0
-        ? goods.reduce((sum, item) => sum + item.pct, 0) / totalGoods
-        : 0;
+    const pcts = entries.map(e => ((e.actual - e.good.srp) / e.good.srp) * 100);
 
-    const atOrBelowSRP = goods.filter((item) => item.pct <= 0).length;
-    const aboveSRP = goods.filter((item) => item.pct > 0).length;
+    const avgPct = totalGoods > 0
+      ? pcts.reduce((sum, val) => sum + val, 0) / totalGoods
+      : 0;
+
+    const atOrBelowSRP = pcts.filter(p => p <= 0).length;
+    const aboveSRP = pcts.filter(p => p > 0).length;
 
     res.json({
       totalGoods,
@@ -49,8 +67,8 @@ router.get("/kpi", async (req, res) => {
       aboveSRP,
     });
   } catch (err) {
-    console.error("Error fetching KPI:", err);
-    res.status(500).json({ error: "Failed to fetch KPI" });
+    console.error("Error in /kpi:", err);
+    res.status(500).json({ error: "Failed to fetch KPI data" });
   }
 });
 
@@ -59,32 +77,43 @@ router.get("/top-alerts", async (req, res) => {
     const { search, regions, channels } = req.query;
     const query = {};
 
-    // filters
-    if (search && search.trim() !== "") {
-      query.name = { $regex: search, $options: "i" }; 
-    }
     if (regions) {
       const regionList = Array.isArray(regions) ? regions : [regions];
-      query.region = { $in: regionList.filter(Boolean) }; // remove undefined
+      query.region = { $in: regionList };
     }
     if (channels) {
       const channelList = Array.isArray(channels) ? channels : [channels];
-      query.channel = { $in: channelList.filter(Boolean) };
+      query.channel = { $in: channelList };
     }
 
-    // find top 5 above srp
-    let aboveSRP = await Good.find({ ...query, pct: { $gt: 0 } })
-      .sort({ pct: -1 })
-      .limit(5);
+    let entries = await PriceEntry.find(query).populate("good");
 
-    // rank number
-    const topAlerts = aboveSRP.map((item, idx) => ({
+    // --- Apply search filter ---
+    if (search) {
+      const term = search.toLowerCase();
+      entries = entries.filter(e =>
+        e.good.name.toLowerCase().includes(term)
+      );
+    }
+
+    // --- Compute pct and filter ---
+    const aboveSRP = entries
+      .map(e => ({
+        ...e.toObject(),
+        pct: ((e.actual - e.good.srp) / e.good.srp) * 100,
+        diff: e.actual - e.good.srp,
+      }))
+      .filter(e => e.pct > 0);
+
+    // Sort and take top 5
+    aboveSRP.sort((a, b) => b.pct - a.pct);
+    const topAlerts = aboveSRP.slice(0, 5).map((item, idx) => ({
       rank: idx + 1,
-      ...item.toObject(),
+      ...item,
     }));
 
     res.json({
-      totalAbove: await Good.countDocuments({ ...query, pct: { $gt: 0 } }),
+      totalAbove: aboveSRP.length,
       topAlerts,
     });
   } catch (err) {

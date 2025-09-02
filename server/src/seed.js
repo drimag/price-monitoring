@@ -1,55 +1,56 @@
 import mongoose from "mongoose";
-import Good from "./models/Good.js"
+import Good from "./models/Good.js";
+import PriceEntry from "./models/PriceEntry.js";
 
-const MONGO_URI = "mongodb://127.0.0.1:27017/price_monitor";
+const MONGO_URI = "mongodb://127.0.0.1:27017/price_monitor"; // adjust if needed
 
 async function seed() {
   try {
     await mongoose.connect(MONGO_URI);
 
-    console.log("Connected to MongoDB");
-
+    // Clear existing collections
     await Good.deleteMany({});
-    console.log("Cleared existing goods");
+    await PriceEntry.deleteMany({});
 
-    await Good.insertMany([
+    console.log("Cleared existing data ✅");
+
+    // Insert Goods (catalog with SRP)
+    const goods = await Good.insertMany([
+      { name: "Rice", category: "Grains", srp: 40 },
+      { name: "Sugar", category: "Sweeteners", srp: 50 },
+      { name: "Sardines", category: "Canned Goods", srp: 20 },
+    ]);
+
+    console.log("Inserted Goods ✅");
+
+    // Insert Price Entries (actual market data)
+    await PriceEntry.insertMany([
       {
-        name: "Rice",
-        category: "Grains",
+        good: goods[0]._id, // Rice
         region: "Metro Manila",
         channel: "Supermarket",
-        srp: 40,
         actual: 45,
-        diff: 5,
-        pct: 12.5,
       },
       {
-        name: "Sugar",
-        category: "Sweeteners",
+        good: goods[1]._id, // Sugar
         region: "South Luzon",
         channel: "Wet Market",
-        srp: 50,
         actual: 55,
-        diff: 5,
-        pct: 10,
       },
       {
-        name: "Sardines",
-        category: "Canned Goods",
+        good: goods[2]._id, // Sardines
         region: "Metro Manila",
         channel: "Convenience Store",
-        srp: 20,
         actual: 18,
-        diff: -2,
-        pct: -10,
       },
     ]);
 
-    console.log("Seed data inserted ✅");
-    mongoose.disconnect();
+    console.log("Inserted PriceEntries ✅");
+
+    process.exit(0);
   } catch (err) {
-    console.error("Error seeding data:", err);
-    mongoose.disconnect();
+    console.error("Seed error ❌:", err);
+    process.exit(1);
   }
 }
 

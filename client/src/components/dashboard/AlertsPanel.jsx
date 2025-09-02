@@ -9,11 +9,11 @@ export default function AlertsPanel({ alerts, context }) {
         </div>
         <div id="topAlerts" className="top-alerts">
           {alerts.map((d, i) => (
-            <div className="alert-row" key={d.good + d.region + d.channel}>
+            <div className="alert-row" key={d.name + d.region + d.channel}>
               <div className="flex" style={{ gap: "12px" }}>
                 <div className="badge b-red">#{i + 1}</div>
                 <div>
-                  <div style={{ fontWeight: 600 }}>{d.good}</div>
+                  <div style={{ fontWeight: 600 }}>{d.name}</div>
                   <div className="stat">
                     {d.region} • {d.channel}
                   </div>
