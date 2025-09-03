@@ -117,7 +117,7 @@ export default function UserEntry() {
       name: productName,
       region,
       channel,
-      price: Number(price),
+      actual: Number(price),
     };
 
     // clear fields
