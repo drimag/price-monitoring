@@ -1,23 +1,15 @@
-import { useEffect, useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
+import { useEffect, useState, useRef } from "react";
+import { Html5Qrcode } from "html5-qrcode";
+import { REGIONS, CHANNELS } from "../constants";
+import "./UserEntry.css";
+import Header from "../components/dashboard/Header";
 
-const REGIONS = [
-  "North Luzon",
-  "South Luzon",
-  "Metro Manila",
-  "Eastern Visayas",
-  "Western Visayas",
-  "Northern Mindanao",
-  "Southern Mindanao",
-];
-
-const CHANNELS = ["Supermarket", "Convenience Store", "Wet Market"];
-
-// Mock product lookup table (barcode → product)
 const PRODUCT_LOOKUP = {
   "123456789012": "Rice",
   "987654321098": "Sugar",
   "111222333444": "Sardines",
+  "49240290": "Soy Sauce (7-11)",
+  "4964522": "Soy Sauce (Kikkoman)",
 };
 
 export default function UserEntry() {
@@ -26,33 +18,103 @@ export default function UserEntry() {
   const [region, setRegion] = useState(REGIONS[0]);
   const [channel, setChannel] = useState(CHANNELS[0]);
   const [price, setPrice] = useState("");
+  const [cameras, setCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState(null);
+
+  const scannerRef = useRef(null);
+  const html5QrCodeRef = useRef(null);
 
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: 250 },
-      false
-    );
-
-    scanner.render(
-      (decodedText) => {
-        setScannedCode(decodedText);
-        if (PRODUCT_LOOKUP[decodedText]) {
-          setProductName(PRODUCT_LOOKUP[decodedText]);
+    Html5Qrcode.getCameras()
+      .then((devices) => {
+        setCameras(devices);
+        if (devices.length > 0) {
+          setSelectedCamera(devices[0].id);
         }
-      },
-      (errorMessage) => {
-        console.warn("Scan error:", errorMessage);
-      }
-    );
+      })
+      .catch((err) => console.error("Camera discovery error:", err));
 
     return () => {
-      scanner.clear().catch((err) => console.error("Clear error:", err));
+      if (html5QrCodeRef.current) {
+        html5QrCodeRef.current.stop().then(() => {
+          html5QrCodeRef.current.clear();
+        });
+      }
     };
   }, []);
 
+  const startScanner = async (cameraId) => {
+    if (!scannerRef.current) return;
+
+    if (html5QrCodeRef.current) {
+      try {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+      } catch (err) {}
+    }
+
+    const html5QrCode = new Html5Qrcode(scannerRef.current.id);
+    html5QrCodeRef.current = html5QrCode;
+
+    html5QrCode
+      .start(
+        { deviceId: { exact: cameraId } },
+        { fps: 10, qrbox: qrBoxSize },
+        (decodedText) => {
+          handleDecoded(decodedText);
+        },
+        (err) => console.warn("Scan error:", err)
+      )
+      .catch((err) => console.error("Start scanner error:", err));
+  };
+
+  const qrBoxSize = (viewfinderWidth, viewfinderHeight) => {
+    return {
+      width: Math.floor(viewfinderWidth * 0.7),
+      height: Math.floor(viewfinderHeight * 0.7),
+    };
+  };
+
+  const handleDecoded = (decodedText) => {
+    console.log("called handledecoded");
+    setScannedCode(decodedText);
+    if (PRODUCT_LOOKUP[decodedText]) {
+      setProductName(PRODUCT_LOOKUP[decodedText]);
+    }
+  };
+
+  const handleCameraChange = (e) => {
+    const camId = e.target.value;
+    setSelectedCamera(camId);
+    startScanner(camId);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const html5QrCode = new Html5Qrcode("reader"); // reuse same container
+      const result = await html5QrCode.scanFile(file, true);
+      handleDecoded(result);
+    } catch (err) {
+      console.error("Image scan error:", err);
+      alert("Could not read barcode from image");
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!scannedCode || !productName) {
+      alert("⚠️ Please scan a valid barcode before submitting.");
+      return;
+    }
+
+    if (!price) {
+      alert("⚠️ Please enter the price.");
+      return;
+    }
+
     const productData = {
       barcode: scannedCode,
       name: productName,
@@ -60,91 +122,84 @@ export default function UserEntry() {
       channel,
       price,
     };
+
     console.log("Submitted:", productData);
-    alert("Product submitted:\n" + JSON.stringify(productData, null, 2));
+    alert("✅ Product submitted:\n" + JSON.stringify(productData, null, 2));
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
-      <h2>Product Data Entry</h2>
-      <p>Scan a barcode or manually enter product details below.</p>
+    <div>
+      <Header />
+      <div className="entry-container">
+        <div className="entry-layout">
+          {/* Left: Scanner / Upload */}
+          <div className="scanner-section">
+            <div id="reader" ref={scannerRef} style={{ width: "100%", minHeight: "240px" }}></div>
 
-      <div id="reader" style={{ width: "300px", margin: "auto" }}></div>
+            {/* Camera select */}
+            {cameras.length > 1 && (
+              <select value={selectedCamera || ""} onChange={handleCameraChange}>
+                {cameras.map((cam) => (
+                  <option key={cam.id} value={cam.id}>
+                    {cam.label || `Camera ${cam.id}`}
+                  </option>
+                ))}
+              </select>
+            )}
 
-      {scannedCode && (
-        <p style={{ marginTop: "10px", color: "#1faa87" }}>
-          ✅ Scanned Code: {scannedCode}
+            <p style={{ alignContent: screenLeft, fontSize: "0.8rem", paddingTop: 5}}>or upload an image: </p>
+            <input type="file" accept="image/*" onChange={handleImageUpload} />
+
+            {scannedCode && (
+              <p style={{ marginTop: "10px", color: "#1faa87", textAlign: "center" }}>
+                ✅ Scanned Code
+              </p>
+            )}
+          </div>
+
+          {/* Right: Form */}
+          <form onSubmit={handleSubmit} className="entry-form">
+            <div className="form-group">
+              <label>Product Name:</label>
+              <input type="text" readOnly value={productName} onChange={(e) => setProductName(e.target.value)} required />
+            </div>
+
+            <div className="form-group">
+              <label>Region:</label>
+              <select value={region} onChange={(e) => setRegion(e.target.value)}>
+                {REGIONS.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Channel:</label>
+              <select value={channel} onChange={(e) => setChannel(e.target.value)}>
+                {CHANNELS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Price Bought For (₱):</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            </div>
+
+            <button type="submit" className="submit-btn">
+              Submit Product
+            </button>
+          </form>
+        </div>
+        <p style={{ textAlign: "center", padding: "20px" }}>
+          Scan live or upload an image, then enter product details.
         </p>
-      )}
-
-      <form onSubmit={handleSubmit} style={{ marginTop: "20px" }}>
-        <div style={{ marginBottom: "10px" }}>
-          <label>Product Name:</label>
-          <input
-            type="text"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            required
-            style={{ width: "100%", padding: "6px" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "10px" }}>
-          <label>Region:</label>
-          <select
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            style={{ width: "100%", padding: "6px" }}
-          >
-            {REGIONS.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "10px" }}>
-          <label>Channel:</label>
-          <select
-            value={channel}
-            onChange={(e) => setChannel(e.target.value)}
-            style={{ width: "100%", padding: "6px" }}
-          >
-            {CHANNELS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ marginBottom: "10px" }}>
-          <label>Price Bought For (₱):</label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-            style={{ width: "100%", padding: "6px" }}
-          />
-        </div>
-
-        <button
-          type="submit"
-          style={{
-            marginTop: "10px",
-            padding: "10px",
-            width: "100%",
-            background: "#1faa87",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-          }}
-        >
-          Submit Product
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
