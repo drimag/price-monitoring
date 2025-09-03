@@ -13,7 +13,10 @@ export default function KpiCards() {
   useEffect(() => {
     fetch("/api/goods/kpi")
       .then((res) => res.json())
-      .then((data) => setKpis(data))
+      .then((data) => {
+        setKpis(data);
+        console.log("KPI data:", data);
+      })
       .catch((err) => console.error("Error fetching kpi:", err));
   }, []);
 

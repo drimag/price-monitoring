@@ -5,11 +5,8 @@ import "./UserEntry.css";
 import Header from "../components/dashboard/Header";
 
 const PRODUCT_LOOKUP = {
-  "123456789012": "Rice",
-  "987654321098": "Sugar",
-  "111222333444": "Sardines",
   "49240290": "Soy Sauce (7-11)",
-  "4964522": "Soy Sauce (Kikkoman)",
+  "49645422": "Soy Sauce (Kikkoman)",
 };
 
 export default function UserEntry() {
@@ -93,7 +90,7 @@ export default function UserEntry() {
     const file = e.target.files[0];
     if (!file) return;
     try {
-      const html5QrCode = new Html5Qrcode("reader"); // reuse same container
+      const html5QrCode = new Html5Qrcode("reader"); 
       const result = await html5QrCode.scanFile(file, true);
       handleDecoded(result);
     } catch (err) {
@@ -102,7 +99,7 @@ export default function UserEntry() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!scannedCode || !productName) {
@@ -120,11 +117,32 @@ export default function UserEntry() {
       name: productName,
       region,
       channel,
-      price,
+      price: Number(price),
     };
 
+    // clear fields
+    setScannedCode("");
+    setProductName("");
+    setPrice("");
+
     console.log("Submitted:", productData);
-    alert("✅ Product submitted:\n" + JSON.stringify(productData, null, 2));
+    alert("Entry submitted:\n" + JSON.stringify(productData, null, 2));
+     try {
+      const res = await fetch("/api/entries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save");
+
+      alert("✅ Product entry saved successfully!");
+      console.log("Saved:", data);
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("❌ Failed to submit: " + err.message);
+    }
   };
 
   return (
@@ -188,7 +206,17 @@ export default function UserEntry() {
 
             <div className="form-group">
               <label>Price Bought For (₱):</label>
-              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val >= 0 || val === "") setPrice(val);
+                }}
+                min="0"
+                step="0.01"
+                required
+              />
             </div>
 
             <button type="submit" className="submit-btn">
