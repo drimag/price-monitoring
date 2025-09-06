@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Header from "../components/dashboard/Header";
+import Header from "../components/Header";
 import ProfileSection from "../components/user/ProfileSection";
 import RewardCard from "../components/user/RewardCard";
 import "./UserProfile.css";

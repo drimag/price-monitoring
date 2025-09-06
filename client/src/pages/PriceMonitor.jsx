@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { REGIONS, CHANNELS } from "../constants"
 import "./PriceMonitor.css";
 
-import Header from "../components/dashboard/Header";
+import Header from "../components/Header";
 import FiltersPanel from "../components/dashboard/FiltersPanel";
 import KpiCards from "../components/dashboard/KpiCards";
 import AlertsPanel from "../components/dashboard/AlertsPanel";

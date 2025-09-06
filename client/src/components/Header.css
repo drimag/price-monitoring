@@ -1,0 +1,46 @@
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(0deg, rgba(11,16,32,.8), rgba(11,16,32,.8));
+  border-bottom: 1px solid var(--border);
+}
+
+.wrap {
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.wrap.header-inner {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+}
+
+.title h1 {
+  font-size: clamp(18px, 3vw, 24px);
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.title small {
+  color: var(--muted);
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}

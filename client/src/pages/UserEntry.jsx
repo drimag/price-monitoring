@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { REGIONS, CHANNELS } from "../constants";
 import "./UserEntry.css";
-import Header from "../components/dashboard/Header";
+import Header from "../components/Header";
 
 const PRODUCT_LOOKUP = {
   "49240290": "Soy Sauce (7-11)",
