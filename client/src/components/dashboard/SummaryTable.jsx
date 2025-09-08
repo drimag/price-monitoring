@@ -20,35 +20,34 @@ export default function SummaryTable({ rows }) {
       <div className="body">
         <div className="flex between" style={{ marginBottom: "8px" }}>
           <h2>Main Summary View</h2>
-          <div className="stat">Click column headers to sort</div>
         </div>
         <div className="table-wrap">
           <table id="summary">
             <thead>
               <tr>
                 <th className="sortable" data-key="good">
-                  Good <span className="caret">▾</span>
+                  Good 
                 </th>
                 <th className="sortable" data-key="category">
-                  Category <span className="caret">▾</span>
+                  Category 
                 </th>
                 <th className="sortable" data-key="region">
-                  Region <span className="caret">▾</span>
+                  Region 
                 </th>
                 <th className="sortable" data-key="channel">
-                  Trade Channel <span className="caret">▾</span>
+                  Trade Channel 
                 </th>
                 <th className="sortable" data-key="srp" data-type="num">
-                  SRP <span className="caret">▾</span>
+                  SRP 
                 </th>
                 <th className="sortable" data-key="actual" data-type="num">
-                  Actual Price <span className="caret">▾</span>
+                  Average Price
                 </th>
                 <th className="sortable" data-key="diff" data-type="num">
-                  Difference <span className="caret">▾</span>
+                  Minimum Price 
                 </th>
                 <th className="sortable" data-key="pct" data-type="num">
-                  % Difference <span className="caret">▾</span>
+                  Maximum Price
                 </th>
                 <th>Status</th>
               </tr>
@@ -61,10 +60,10 @@ export default function SummaryTable({ rows }) {
                     <td>{row.category}</td>
                     <td>{row.region}</td>
                     <td>{row.channel}</td>
-                    <td>{row.srp}</td>
-                    <td>{row.actual}</td>
-                    <td>{row.diff}</td>
-                    <td>{row.pct}%</td>
+                    <td>₱{row.srp}</td>
+                    <td>₱{row.actual} ({row.pct > 0 ? `+${row.pct}` : row.pct}%)</td>
+                    <td>₱{row.minPrice} ({row.minDiffPCT > 0 ? `+${row.minDiffPCT}` : row.minDiffPCT}%)</td>
+                    <td>₱{row.maxPrice} ({row.maxDiffPCT > 0 ? `+${row.maxDiffPCT}` : row.maxDiffPCT}%)</td>
                     <td>{statusBadge(row.pct)}</td>
                   </tr>
                 ))

@@ -36,7 +36,6 @@ router.get("/kpi", async (req, res) => {
   try {
     const goods = await Good.find();
     const aggregated = aggregateEntries(goods);
-    console.log("aggregated kpi:" + aggregated);
 
     const totalGoods = aggregated.length;
     const avgPct = totalGoods > 0 ? aggregated.reduce((sum, i) => sum + i.pct, 0) / totalGoods : 0;
@@ -92,11 +91,18 @@ function aggregateEntries(goods) {
     good.priceEntries.forEach((entry) => {
       const key = `${entry.region}-${entry.channel}`;
       if (!groups.has(key)) {
-        groups.set(key, { sum: 0, count: 0, region: entry.region, channel: entry.channel });
+        groups.set(key, {
+          sum: 0,
+          count: 0,
+          region: entry.region,
+          channel: entry.channel,
+          prices: [],
+        });
       }
       const g = groups.get(key);
       g.sum += entry.actual;
       g.count += 1;
+      g.prices.push(entry.actual);
     });
 
     // Compute averages for each (region, channel)
@@ -105,6 +111,12 @@ function aggregateEntries(goods) {
         const avgActual = g.sum / g.count;
         const diff = avgActual - good.srp;
         const pct = (diff / good.srp) * 100;
+
+        const minPrice = Math.min(...g.prices);
+        const maxPrice = Math.max(...g.prices);
+
+        const minDiffPCT = ((minPrice - avgActual) / avgActual) * 100;
+        const maxDiffPCT = ((maxPrice - avgActual) / avgActual) * 100;
 
         results.push({
           name: good.name,
@@ -115,11 +127,14 @@ function aggregateEntries(goods) {
           actual: avgActual,
           diff,
           pct,
+          minPrice,
+          minDiffPCT,
+          maxPrice,
+          maxDiffPCT,
         });
       }
     });
   });
-  console.log("aggregate results: " + results);
   return results;
 }
 

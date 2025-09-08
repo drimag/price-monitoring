@@ -36,7 +36,8 @@ export default function ChartPanel({ rows }) {
         g.n += 1;
         groups.set(k, g);
       });
-
+      
+      console.log("keys: " + keys);
       return keys.map((k) => ({
         key: k,
         avg: groups.get(k).n ? groups.get(k).sum / groups.get(k).n : 0,
@@ -46,19 +47,23 @@ export default function ChartPanel({ rows }) {
     function clearCanvas() {
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
+
       canvas.width = rect.width * dpr;
-      canvas.height = 220 * dpr; // fixed height
+      canvas.height = 220 * dpr;
+
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, rect.width, canvas.height);
       return rect;
     }
+
+
 
     function drawChart() {
       const rect = clearCanvas();
       const data = computeChartData();
 
       const W = rect.width,
-        H = canvas.height;
+            H = canvas.height;
       const pad = 28;
       const baseY = H - pad;
       const topY = pad;
@@ -103,7 +108,7 @@ export default function ChartPanel({ rows }) {
         ctx.fillStyle = fill;
         ctx.fillRect(x, Math.min(y, yNeg), barW, h || 2);
 
-        ctx.fillStyle = "#9fb0de";
+        ctx.fillStyle = "#d7def2";
         ctx.font = "10px system-ui, sans-serif";
         const label = d.key;
         ctx.fillText(label, x + barW / 2, baseY + 6);
