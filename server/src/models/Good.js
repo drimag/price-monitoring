@@ -11,7 +11,7 @@ const GoodSchema = new mongoose.Schema({
   name: { type: String, required: true },
   category: String,
   barcode: { type: String, unique: true },
-  srp: { type: Number, required: true }, // keep SRP at the Good level
+  srp: { type: Number, required: true }, 
   priceEntries: [PriceEntrySchema],
 });
 

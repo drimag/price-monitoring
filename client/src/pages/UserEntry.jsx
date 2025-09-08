@@ -5,11 +5,12 @@ import "./UserEntry.css";
 import Header from "../components/Header";
 
 const PRODUCT_LOOKUP = {
-  "49240290": "Soy Sauce (7-11)",
-  "49645422": "Soy Sauce (Kikkoman)",
+  "49240290": "Soy Sauce",
+  "49645422": "Soy Sauce",
 };
 
 export default function UserEntry() {
+  const [goods, setGoods] = useState([]);
   const [scannedCode, setScannedCode] = useState("");
   const [productName, setProductName] = useState("");
   const [region, setRegion] = useState(REGIONS[0]);
@@ -20,6 +21,13 @@ export default function UserEntry() {
 
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
+
+  useEffect(() => {
+    fetch("/api/entries/goods")
+      .then((res) => res.json())
+      .then((data) => setGoods(data))
+      .catch((err) => console.error("Error fetching goods:", err));
+  }, []);
 
   useEffect(() => {
     Html5Qrcode.getCameras()
@@ -102,8 +110,8 @@ export default function UserEntry() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!scannedCode || !productName) {
-      alert("⚠️ Please scan a valid barcode before submitting.");
+    if (!productName) {
+      alert("⚠️ Please enter a product name before submitting.");
       return;
     }
 
@@ -179,7 +187,18 @@ export default function UserEntry() {
           <form onSubmit={handleSubmit} className="entry-form">
             <div className="form-group">
               <label>Product Name:</label>
-              <input type="text" readOnly value={productName} onChange={(e) => setProductName(e.target.value)} required />
+              <select
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                required
+              >
+                <option value="">-- Select a product --</option>
+                {goods.map((g) => (
+                  <option key={g._id} value={g.name}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="form-group">
