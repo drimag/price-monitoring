@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import Header from "../components/Header";
 import ProfileSection from "../components/user/ProfileSection";
 import RewardCard from "../components/user/RewardCard";
@@ -28,7 +29,26 @@ export default function UserProfile() {
   }, []);
 
   const handleRedeem = (reward) => {
-    console.log("Redeemed:", reward);
+    // Simulate each reward costs 20 points
+    fetch("/api/user/redeem", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cost: 20 }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Redemption failed");
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Redeemed:", reward, data);
+        setUser(data.user);
+        toast.success(`✅ Redeemed: ${reward.title}`);
+      })
+      .catch((err) => {
+        console.log("failed to redeem: ", err);
+        console.error("Error redeeming:", err);
+        toast.error("❌ Failed to redeem reward");
+      });
   };
 
   return (
