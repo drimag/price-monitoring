@@ -9,10 +9,10 @@ export default function Header() {
           <h1>Price Monitoring</h1>
         </div>
         <nav className="nav-links">
-          <a href="/">Dashboard</a>
-          <a href="/admin">Admin</a>
-          <a href="/entry">Entries</a>
-          <a href="/profile">Profile</a>
+          <Link to="/">Dashboard</Link>
+          <Link to="/admin">Admin</Link>
+          <Link to="/entry">Entries</Link>
+          <Link to="/profile">Profile</Link>
         </nav>
       </div>
       
