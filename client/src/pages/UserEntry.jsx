@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { toast } from "react-toastify";
 import { Html5Qrcode } from "html5-qrcode";
 import { REGIONS, CHANNELS } from "../constants";
 import "./UserEntry.css";
@@ -134,7 +135,7 @@ export default function UserEntry() {
     setPrice("");
 
     console.log("Submitted:", productData);
-    alert("Entry submitted:\n" + JSON.stringify(productData, null, 2));
+    // alert("Entry submitted:\n" + JSON.stringify(productData, null, 2));
      try {
       const res = await fetch("/api/entries", {
         method: "POST",
@@ -145,11 +146,11 @@ export default function UserEntry() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save");
 
-      alert("✅ Product entry saved successfully!");
+      toast.success("✅ Product entry saved successfully!");
       console.log("Saved:", data);
     } catch (err) {
       console.error("Submit error:", err);
-      alert("❌ Failed to submit: " + err.message);
+      toast.error("❌ Failed to submit: " + err.message);
     }
   };
 
