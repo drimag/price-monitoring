@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { REGIONS, CHANNELS } from "../constants"
 import "./PriceMonitor.css";
+import { mockApi } from "../mockDb";
 
 import Header from "../components/Header";
 import FiltersPanel from "../components/dashboard/FiltersPanel";
@@ -19,32 +20,34 @@ function PriceMonitor() {
   const [alerts, setAlerts] = useState([]);
   const [context, setContext] = useState("");
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (filters.search) params.append("search", filters.search);
-    filters.regions.forEach((r) => params.append("regions", r));
-    filters.channels.forEach((c) => params.append("channels", c));
-
-    fetch(`/api/goods?${params.toString()}`)
-      .then((res) => res.json())
-      .then(setData)
-      .catch((err) => console.error("Error fetching summary:", err));
-  }, [filters]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (filters.search) params.append("search", filters.search);
-    filters.regions.forEach((r) => params.append("regions", r));
-    filters.channels.forEach((c) => params.append("channels", c));
+    mockApi.getGoods().then((allGoods) => {
 
-    fetch(`/api/goods/top-alerts?${params.toString()}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setAlerts(data.topAlerts || []);
-        setContext(`${data.totalAbove} items above SRP in current view`);
-      })
-      .catch((err) => console.error("Error fetching top alerts:", err));
+      let allRows = allGoods.flatMap((good) => aggregateGood(good));
+      // now filter rows instead of goods
+      if (filters.search) {
+        const term = filters.search.toLowerCase();
+        allRows = allRows.filter((row) =>
+          row.name.toLowerCase().includes(term)
+        );
+      }
+
+      if (filters.regions && filters.regions.size > 0) {
+        allRows = allRows.filter((row) => filters.regions.has(row.region));
+      }
+
+      if (filters.channels && filters.channels.size > 0) {
+        allRows = allRows.filter((row) => filters.channels.has(row.channel));
+      }
+
+      setData(allRows);
+
+      const aboveSRP = allRows.filter((i) => i.pct > 0).sort((a, b) => b.pct - a.pct);
+      const topAlerts = allRows.slice(0, 5).map((item, idx) => ({ rank: idx + 1, ...item }));
+      setAlerts(topAlerts);
+      setContext(`${aboveSRP.length} items above SRP in current view`);
+    });
   }, [filters]);
 
   return (
@@ -70,6 +73,56 @@ function PriceMonitor() {
       </main>
     </>
   );
+}
+
+function aggregateGood(good) {
+  const groups = new Map();
+  console.log("aggregating: " + good);
+  good.priceEntries.forEach((entry) => {
+    const key = `${entry.region}-${entry.channel}`;
+    if (!groups.has(key)) {
+      groups.set(key, {
+        region: entry.region,
+        channel: entry.channel,
+        sum: 0,
+        count: 0,
+        min: entry.actual,
+        max: entry.actual,
+      });
+    }
+    const g = groups.get(key);
+    g.sum += entry.actual;
+    g.count++;
+    g.min = Math.min(g.min, entry.actual);
+    g.max = Math.max(g.max, entry.actual);
+  });
+
+  const results = [];
+  groups.forEach((g) => {
+    const avgActual = g.sum / g.count;
+    const diff = avgActual - good.srp;
+    const pct = (diff / good.srp) * 100;
+
+    const minDiffPCT = ((g.min - avgActual) / avgActual) * 100;
+    const maxDiffPCT = ((g.max - avgActual) / avgActual) * 100;
+
+    results.push({
+      name: good.name,
+      category: good.category,
+      region: g.region,
+      channel: g.channel,
+      srp: good.srp,
+      actual: avgActual,
+      diff,
+      pct,
+      minPrice: g.min,
+      maxPrice: g.max,
+      minDiffPCT,
+      maxDiffPCT,
+    });
+  });
+
+  return results;
 }
 
 export default PriceMonitor;
