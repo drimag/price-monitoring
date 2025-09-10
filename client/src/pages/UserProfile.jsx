@@ -7,12 +7,12 @@ import "./UserProfile.css";
 
 export default function UserProfile() {
   const [user, setUser] = useState({
-    name: "",
-    mobile: "",
-    region: "",
-    role: "",
-    points: 0,
-    pointsUsed: 0
+    name: "Juan Dela Cruz",
+    mobile: "0917-123-4567",
+    region: "Metro Manila",
+    role: "Admin",
+    points: 100,
+    pointsUsed: 20
   });
 
   const rewards = [
@@ -22,33 +22,24 @@ export default function UserProfile() {
   ];
 
   useEffect(() => {
-    fetch("/api/user/me")
-      .then((res) => res.json())
-      .then(setUser)
-      .catch((err) => console.error("Error fetching user:", err));
+    setUser(user);
   }, []);
 
   const handleRedeem = (reward) => {
-    // Simulate each reward costs 20 points
-    fetch("/api/user/redeem", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cost: 20 }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Redemption failed");
-        return res.json();
-      })
-      .then((data) => {
-        console.log("Redeemed:", reward, data);
-        setUser(data.user);
-        toast.success(`✅ Redeemed: ${reward.title}`);
-      })
-      .catch((err) => {
-        console.log("failed to redeem: ", err);
-        console.error("Error redeeming:", err);
-        toast.error("❌ Failed to redeem reward");
-      });
+    if ((user.points - user.pointsUsed) < 20){
+      toast.error("❌ Failed to redeem reward")
+    } else {
+      toast.success(`✅ Redeemed: ${reward.title}`);
+      let updatedUser = {
+        name: user.name,
+        mobile: user.mobile,
+        region: user.region,
+        role: user.role,
+        points: user.points,
+        pointsUsed: user.pointsUsed + 20
+      }
+      setUser(updatedUser);
+    }
   };
 
   return (
