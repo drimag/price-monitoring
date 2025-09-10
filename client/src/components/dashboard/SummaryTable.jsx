@@ -61,9 +61,21 @@ export default function SummaryTable({ rows }) {
                     <td>{row.region}</td>
                     <td>{row.channel}</td>
                     <td>₱{row.srp}</td>
-                    <td>₱{row.actual} ({row.pct > 0 ? `+${row.pct}` : row.pct}%)</td>
-                    <td>₱{row.minPrice} ({row.minDiffPCT > 0 ? `+${row.minDiffPCT}` : row.minDiffPCT}%)</td>
-                    <td>₱{row.maxPrice} ({row.maxDiffPCT > 0 ? `+${row.maxDiffPCT}` : row.maxDiffPCT}%)</td>
+                    <td>
+                      ₱{row.actual.toFixed(2)} (
+                      {row.pct > 0 ? `+${row.pct.toFixed(2)}` : row.pct.toFixed(2)}%
+                      )
+                    </td>
+                    <td>
+                      ₱{row.minPrice} (
+                      {row.minDiffPCT > 0 ? `+${row.minDiffPCT.toFixed(2)}` : row.minDiffPCT.toFixed(2)}%
+                      )
+                    </td>
+                    <td>
+                      ₱{row.maxPrice} (
+                      {row.maxDiffPCT > 0 ? `+${row.maxDiffPCT.toFixed(2)}` : row.maxDiffPCT.toFixed(2)}%
+                      )
+                    </td>
                     <td>{statusBadge(row.pct)}</td>
                   </tr>
                 ))

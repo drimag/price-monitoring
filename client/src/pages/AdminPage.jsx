@@ -1,50 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Header from "../components/Header";
 import "./AdminPage.css";
+import { mockApi } from "../mockDb";
 
 export default function AdminPage() {
   // Mock data for now
-  const [goods, setGoods] = useState([
-    {
-      _id: "1",
-      name: "Rice",
-      category: "Grains",
-      srp: 40,
-      priceEntries: [
-        { _id: "e1", region: "Metro Manila", channel: "Supermarket", actual: 45 },
-        { _id: "e2", region: "South Luzon", channel: "Wet Market", actual: 42 },
-      ],
-    },
-    {
-      _id: "2",
-      name: "Sugar",
-      category: "Sweeteners",
-      srp: 50,
-      priceEntries: [
-        { _id: "e3", region: "Metro Manila", channel: "Convenience Store", actual: 52 },
-      ],
-    },
-  ]);
+  const [goods, setGoods] = useState([]);
 
-  // Add new good
+  useEffect(() => {
+    mockApi.getGoods().then((data) => {
+      setGoods(data);
+    });
+  }, []);
+
   const addGood = () => {
-    const newGood = {
-      _id: Date.now().toString(),
-      name: "New Good",
-      category: "Uncategorized",
-      srp: 0,
-      priceEntries: [],
-    };
+    mockApi.addGood();
     setGoods([...goods, newGood]);
   };
 
   // Delete good
   const deleteGood = (id) => {
+    mockApi.deleteGood(id);
     setGoods(goods.filter((g) => g._id !== id));
   };
 
   // Update good name/category/srp
   const updateGood = (id, field, value) => {
+    mockApi.updateGood(id, field, value)
     setGoods(
       goods.map((g) =>
         g._id === id ? { ...g, [field]: value } : g
@@ -54,6 +36,7 @@ export default function AdminPage() {
 
   // Add entry to a good
   const addEntry = (goodId) => {
+    mockApi.addEntry(goodId);
     setGoods(
       goods.map((g) =>
         g._id === goodId
@@ -71,6 +54,7 @@ export default function AdminPage() {
 
   // Delete entry
   const deleteEntry = (goodId, entryId) => {
+    mockApi.deleteEntry(goodId, entryId);
     setGoods(
       goods.map((g) =>
         g._id === goodId
@@ -82,6 +66,7 @@ export default function AdminPage() {
 
   // Update entry
   const updateEntry = (goodId, entryId, field, value) => {
+    mockApi.updateEntry(goodId, entryId, field, value);
     setGoods(
       goods.map((g) =>
         g._id === goodId

@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { Html5Qrcode } from "html5-qrcode";
 import { REGIONS, CHANNELS } from "../constants";
 import "./UserEntry.css";
+import { mockApi } from "../mockDb";
 import Header from "../components/Header";
 
 const PRODUCT_LOOKUP = {
@@ -24,10 +25,9 @@ export default function UserEntry() {
   const html5QrCodeRef = useRef(null);
 
   useEffect(() => {
-    fetch("/api/entries/goods")
-      .then((res) => res.json())
-      .then((data) => setGoods(data))
-      .catch((err) => console.error("Error fetching goods:", err));
+    mockApi.getGoods().then((data) => {
+      setGoods(data);
+    });
   }, []);
 
   useEffect(() => {
@@ -135,19 +135,9 @@ export default function UserEntry() {
     setPrice("");
 
     console.log("Submitted:", productData);
-    // alert("Entry submitted:\n" + JSON.stringify(productData, null, 2));
      try {
-      const res = await fetch("/api/entries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(productData),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save");
-
+      await mockApi.addPriceEntry(productName, region, channel, Number(price));
       toast.success("✅ Product entry saved successfully!");
-      console.log("Saved:", data);
     } catch (err) {
       console.error("Submit error:", err);
       toast.error("❌ Failed to submit: " + err.message);

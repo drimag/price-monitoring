@@ -1,4 +1,4 @@
-export const goods = [
+export let goods = [
   {
     _id: "1",
     name: "Rice",
@@ -6,10 +6,10 @@ export const goods = [
     barcode: "123456789012",
     srp: 40,
     priceEntries: [
-      { region: "Metro Manila", channel: "Supermarket", actual: 45, date: "2025-08-01" },
-      { region: "Metro Manila", channel: "Supermarket", actual: 55, date: "2025-08-02" },
-      { region: "South Luzon", channel: "Wet Market", actual: 42, date: "2025-08-02" },
-      { region: "North Luzon", channel: "Convenience Store", actual: 44, date: "2025-08-03" },
+      { _id: "11", region: "Metro Manila", channel: "Supermarket", actual: 45, date: "2025-08-01" },
+      { _id: "12", region: "Metro Manila", channel: "Supermarket", actual: 55, date: "2025-08-02" },
+      { _id: "13", region: "South Luzon", channel: "Wet Market", actual: 42, date: "2025-08-02" },
+      { _id: "14", region: "North Luzon", channel: "Convenience Store", actual: 44, date: "2025-08-03" },
     ],
   },
   {
@@ -19,8 +19,8 @@ export const goods = [
     barcode: "987654321098",
     srp: 50,
     priceEntries: [
-      { region: "Metro Manila", channel: "Supermarket", actual: 55, date: "2025-08-01" },
-      { region: "South Luzon", channel: "Wet Market", actual: 53, date: "2025-08-02" },
+      { _id: "21", region: "Metro Manila", channel: "Supermarket", actual: 55, date: "2025-08-01" },
+      { _id: "22", region: "South Luzon", channel: "Wet Market", actual: 53, date: "2025-08-02" },
     ],
   },
   {
@@ -30,8 +30,8 @@ export const goods = [
     barcode: "111222333444",
     srp: 20,
     priceEntries: [
-      { region: "Metro Manila", channel: "Convenience Store", actual: 18, date: "2025-08-01" },
-      { region: "Western Visayas", channel: "Supermarket", actual: 22, date: "2025-08-02" },
+      { _id: "31", region: "Metro Manila", channel: "Convenience Store", actual: 18, date: "2025-08-01" },
+      { _id: "32", region: "Western Visayas", channel: "Supermarket", actual: 22, date: "2025-08-02" },
     ],
   },
 ];
@@ -43,12 +43,80 @@ export const mockApi = {
   getGoodById: (id) =>
     Promise.resolve(goods.find((g) => g._id === id) || null),
 
-  addPriceEntry: (goodId, entry) => {
-    const good = goods.find((g) => g._id === goodId);
-    if (good) {
-      good.priceEntries.push({ ...entry, date: new Date().toISOString() });
-      return Promise.resolve(entry);
-    }
-    return Promise.reject("Good not found");
+  addPriceEntry: (name, region, channel, actual) => {
+    const good = goods.find((g) => g.name === name);
+    if (!good) throw new Error("Good not found");
+
+    const newEntry = { 
+      _id: `${good._id}-${good.priceEntries.length + 1}`, 
+      region, channel, actual, date: new Date() 
+    };
+    good.priceEntries.push(newEntry);
+
+    return Promise.resolve(newEntry);
+  },
+
+  addGood: () => {
+    const newGood = {
+      _id: Date.now().toString(),
+      name: "New Good",
+      category: "Uncategorized",
+      srp: 0,
+      priceEntries: [],
+    };
+    goods = [...goods, newGood];
+    return Promise.resolve(newGood);
+  },
+
+  deleteGood: (id) => {
+    goods = goods.filter((g) => g._id !== id);
+    return Promise.resolve(true);
+  },
+
+  updateGood: (id, field, value) => {
+    goods = goods.map((g) =>
+      g._id === id ? { ...g, [field]: value } : g
+    );
+    return Promise.resolve(true);
+  },
+
+  // --- ENTRIES ---
+  addEntry: (goodId) => {
+    const newEntry = {
+      _id: Date.now().toString(),
+      region: "Region X",
+      channel: "Channel Y",
+      actual: 0,
+      date: new Date(),
+    };
+    goods = goods.map((g) =>
+      g._id === goodId
+        ? { ...g, priceEntries: [...g.priceEntries, newEntry] }
+        : g
+    );
+    return Promise.resolve(newEntry);
+  },
+
+  deleteEntry: (goodId, entryId) => {
+    goods = goods.map((g) =>
+      g._id === goodId
+        ? { ...g, priceEntries: g.priceEntries.filter((e) => e._id !== entryId) }
+        : g
+    );
+    return Promise.resolve(true);
+  },
+
+  updateEntry: (goodId, entryId, field, value) => {
+    goods = goods.map((g) =>
+      g._id === goodId
+        ? {
+            ...g,
+            priceEntries: g.priceEntries.map((e) =>
+              e._id === entryId ? { ...e, [field]: value } : e
+            ),
+          }
+        : g
+    );
+    return Promise.resolve(true);
   },
 };
