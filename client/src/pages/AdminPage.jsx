@@ -91,40 +91,65 @@ export default function AdminPage() {
         {goods.map((good) => (
           <div key={good._id} className="good-card">
             <div className="good-header">
-              <input
-                value={good.name}
-                onChange={(e) => updateGood(good._id, "name", e.target.value)}
-              />
-              <input
-                value={good.category}
-                onChange={(e) => updateGood(good._id, "category", e.target.value)}
-              />
-              <input
-                type="number"
-                value={good.srp}
-                onChange={(e) => updateGood(good._id, "srp", e.target.value)}
-              />
+              <div className="field">
+                <small>Name</small>
+                <input
+                  value={good.name}
+                  onChange={(e) => updateGood(good._id, "name", e.target.value)}
+                />
+              </div>
+
+              <div className="field">
+                <small>Category</small>
+                <input
+                  value={good.category}
+                  onChange={(e) => updateGood(good._id, "category", e.target.value)}
+                />
+              </div>
+
+              <div className="field">
+                <small>SRP</small>
+                <input
+                  type="number"
+                  value={good.srp}
+                  onChange={(e) => updateGood(good._id, "srp", e.target.value)}
+                />
+              </div>
+
               <button onClick={() => deleteGood(good._id)}>Delete Good</button>
             </div>
 
             <div className="entries">
               <h4>Price Entries</h4>
               <button onClick={() => addEntry(good._id)}>+ Add Entry</button>
+
               {good.priceEntries.map((entry) => (
                 <div key={entry._id} className="entry-row">
-                  <input
-                    value={entry.region}
-                    onChange={(e) => updateEntry(good._id, entry._id, "region", e.target.value)}
-                  />
-                  <input
-                    value={entry.channel}
-                    onChange={(e) => updateEntry(good._id, entry._id, "channel", e.target.value)}
-                  />
-                  <input
-                    type="number"
-                    value={entry.actual}
-                    onChange={(e) => updateEntry(good._id, entry._id, "actual", e.target.value)}
-                  />
+                  <div className="field">
+                    <small>Region</small>
+                    <input
+                      value={entry.region}
+                      onChange={(e) => updateEntry(good._id, entry._id, "region", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="field">
+                    <small>Channel</small>
+                    <input
+                      value={entry.channel}
+                      onChange={(e) => updateEntry(good._id, entry._id, "channel", e.target.value)}
+                    />
+                  </div>
+
+                  <div className="field">
+                    <small>Actual</small>
+                    <input
+                      type="number"
+                      value={entry.actual}
+                      onChange={(e) => updateEntry(good._id, entry._id, "actual", e.target.value)}
+                    />
+                  </div>
+
                   <button onClick={() => deleteEntry(good._id, entry._id)}>Delete Entry</button>
                 </div>
               ))}

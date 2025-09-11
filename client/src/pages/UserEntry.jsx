@@ -189,6 +189,10 @@ export default function UserEntry() {
                     {g.name}
                   </option>
                 ))}
+
+                {productName && !goods.some((g) => g.name === productName) && (
+                  <option value={productName}>{productName} (new)</option>
+                )}
               </select>
             </div>
 

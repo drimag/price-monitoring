@@ -115,3 +115,14 @@
 .add-btn:hover {
   background: #189b72;
 }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-right: 8px;
+}
+
+.field small {
+  margin-bottom: 2px;
+  font-size: 12px;
+}

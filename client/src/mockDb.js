@@ -44,8 +44,18 @@ export const mockApi = {
     Promise.resolve(goods.find((g) => g._id === id) || null),
 
   addPriceEntry: (name, region, channel, actual) => {
-    const good = goods.find((g) => g.name === name);
-    if (!good) throw new Error("Good not found");
+    let good = goods.find((g) => g.name === name);
+    if (!good){
+      const newGood = {
+        _id: Object.keys(goods).length + 1,
+        name: name,
+        category: "Uncategorized",
+        srp: 0,
+        priceEntries: [],
+      };
+      goods = [...goods, newGood];
+      good = goods.find((g) => g.name === name);
+    }
 
     const newEntry = { 
       _id: `${good._id}-${good.priceEntries.length + 1}`, 
@@ -58,7 +68,7 @@ export const mockApi = {
 
   addGood: () => {
     const newGood = {
-      _id: Date.now().toString(),
+      _id: Object.keys(goods).length,
       name: "New Good",
       category: "Uncategorized",
       srp: 0,
