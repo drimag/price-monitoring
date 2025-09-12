@@ -60,7 +60,7 @@ function PriceMonitor() {
           <FiltersPanel filters={filters} setFilters={setFilters}/>
 
           <section className="right-content">
-            <KpiCards />
+            <KpiCards rows={data}/>
             <AlertsPanel alerts={alerts} context={context}/>
             <ChartPanel rows={data}/>
           </section>
@@ -77,7 +77,6 @@ function PriceMonitor() {
 
 function aggregateGood(good) {
   const groups = new Map();
-  console.log("aggregating: " + good);
   good.priceEntries.forEach((entry) => {
     const key = `${entry.region}-${entry.channel}`;
     if (!groups.has(key)) {
@@ -103,8 +102,8 @@ function aggregateGood(good) {
     const diff = avgActual - good.srp;
     const pct = (diff / good.srp) * 100;
 
-    const minDiffPCT = ((g.min - avgActual) / avgActual) * 100;
-    const maxDiffPCT = ((g.max - avgActual) / avgActual) * 100;
+    const minDiffPCT = ((g.min - good.srp) / good.srp) * 100;
+    const maxDiffPCT = ((g.max - good.srp) / good.srp) * 100;
 
     results.push({
       name: good.name,
@@ -121,7 +120,7 @@ function aggregateGood(good) {
       maxDiffPCT,
     });
   });
-
+  
   return results;
 }
 
