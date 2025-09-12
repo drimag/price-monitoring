@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./KpiCards.css";
 
 import { mockApi } from "../../mockDb";
-export default function KpiCards() {
+export default function KpiCards({ rows }) {
 
   const [kpis, setKpis] = useState({
     totalGoods: 0,
@@ -12,46 +12,64 @@ export default function KpiCards() {
   });
 
   useEffect(() => {
-    mockApi.getGoods().then((allGoods) => {
+    console.log("rows:", rows);
 
-    const perGoodStats = allGoods.map((good) => {
-      if (!good.priceEntries || good.priceEntries.length === 0) {
+    if (!rows || rows.length === 0){
+      setKpis({
+        totalGoods: 0,
+        avgPct: 0,
+        atOrBelowSRP: 0,
+        aboveSRP: 0,
+      });
+      return;
+    } 
+
+    // ✅ Group rows by product name
+    const goodsMap = new Map();
+
+    rows.forEach((row) => {
+      if (!goodsMap.has(row.name)) {
+        goodsMap.set(row.name, {
+          name: row.name,
+          srp: row.srp,
+          priceEntries: [],
+        });
+      }
+      goodsMap.get(row.name).priceEntries.push(row.actual);
+    });
+
+    console.log("Grouped goods:", Array.from(goodsMap.values()));
+
+    // ✅ Compute stats per unique good
+    const perGoodStats = Array.from(goodsMap.values()).map((good) => {
+      if (good.priceEntries.length === 0) {
         return { name: good.name, avgPct: 0 };
       }
-
-      // average actual across all entries for this good
       const avgActual =
-        good.priceEntries.reduce((sum, e) => sum + e.actual, 0) /
+        good.priceEntries.reduce((sum, val) => sum + val, 0) /
         good.priceEntries.length;
 
-      // % diff from SRP
       const avgPct = ((avgActual - good.srp) / good.srp) * 100;
-
       return { name: good.name, avgPct };
     });
 
     const totalGoods = perGoodStats.length;
 
-    // overall average: average of per-good % diffs
     const avgPct =
       totalGoods > 0
         ? perGoodStats.reduce((sum, g) => sum + g.avgPct, 0) / totalGoods
         : 0;
 
-    // goods at or below SRP
     const atOrBelowSRP = perGoodStats.filter((g) => g.avgPct <= 0).length;
-
-    // goods above SRP
     const aboveSRP = perGoodStats.filter((g) => g.avgPct > 0).length;
 
-      setKpis({
-        totalGoods,
-        avgPct,
-        atOrBelowSRP,
-        aboveSRP
-      })
+    setKpis({
+      totalGoods,
+      avgPct,
+      atOrBelowSRP,
+      aboveSRP,
     });
-  }, []);
+  }, [rows]);
 
   return (
     <div className="cards">
@@ -73,54 +91,4 @@ export default function KpiCards() {
       </div>
     </div>
   );
-}
-
-function aggregateGood(good) {
-  const groups = new Map();
-  console.log("aggregating: " + good);
-  good.priceEntries.forEach((entry) => {
-    const key = `${entry.region}-${entry.channel}`;
-    if (!groups.has(key)) {
-      groups.set(key, {
-        region: entry.region,
-        channel: entry.channel,
-        sum: 0,
-        count: 0,
-        min: entry.actual,
-        max: entry.actual,
-      });
-    }
-    const g = groups.get(key);
-    g.sum += entry.actual;
-    g.count++;
-    g.min = Math.min(g.min, entry.actual);
-    g.max = Math.max(g.max, entry.actual);
-  });
-
-  const results = [];
-  groups.forEach((g) => {
-    const avgActual = g.sum / g.count;
-    const diff = avgActual - good.srp;
-    const pct = (diff / good.srp) * 100;
-
-    const minDiffPCT = ((g.min - avgActual) / avgActual) * 100;
-    const maxDiffPCT = ((g.max - avgActual) / avgActual) * 100;
-
-    results.push({
-      name: good.name,
-      category: good.category,
-      region: g.region,
-      channel: g.channel,
-      srp: good.srp,
-      actual: avgActual,
-      diff,
-      pct,
-      minPrice: g.min,
-      maxPrice: g.max,
-      minDiffPCT,
-      maxDiffPCT,
-    });
-  });
-
-  return results;
 }

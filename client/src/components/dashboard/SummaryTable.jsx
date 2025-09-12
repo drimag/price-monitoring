@@ -1,7 +1,9 @@
 import "./SummaryTable.css";
 import {THRESH_RED, THRESH_YELLOW} from "../../constants.js"
+import { useEffect, useState } from "react";
 
 export default function SummaryTable({ rows }) {
+
   function statusBadge(pct) {
     if (pct <= 0) {
       return <span className="badge b-green">At/Below SRP</span>;
