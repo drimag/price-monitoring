@@ -13,6 +13,7 @@ export default function Header() {
           <Link to="/admin">Admin</Link>
           <Link to="/entry">Entries</Link>
           <Link to="/profile">Profile</Link>
+          <Link to="/tracker">Tracker</Link>
         </nav>
       </div>
       
