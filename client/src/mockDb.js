@@ -3,6 +3,7 @@ export let goods = [
     _id: "1",
     name: "Rice",
     category: "Grains",
+    brand: "SM",
     barcode: "123456789012",
     srp: 40,
     priceEntries: [
@@ -16,6 +17,7 @@ export let goods = [
     _id: "2",
     name: "Sugar",
     category: "Sweeteners",
+    brand: "SM",
     barcode: "987654321098",
     srp: 50,
     priceEntries: [
@@ -27,6 +29,7 @@ export let goods = [
     _id: "3",
     name: "Sardines",
     category: "Canned Goods",
+    brand: "SM",
     barcode: "111222333444",
     srp: 20,
     priceEntries: [

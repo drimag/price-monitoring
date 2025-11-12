@@ -39,6 +39,9 @@ export default function SummaryTable({ rows }) {
                 <th className="sortable" data-key="channel">
                   Trade Channel 
                 </th>
+                <th className="sortable" data-key="brand">
+                  Brand 
+                </th>
                 <th className="sortable" data-key="srp" data-type="num">
                   SRP 
                 </th>
@@ -62,6 +65,7 @@ export default function SummaryTable({ rows }) {
                     <td>{row.category}</td>
                     <td>{row.region}</td>
                     <td>{row.channel}</td>
+                    <td>{row.brand}</td>
                     <td>₱{row.srp}</td>
                     <td>
                       ₱{row.actual.toFixed(2)} (
