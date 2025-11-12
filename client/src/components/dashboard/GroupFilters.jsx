@@ -1,10 +1,10 @@
-import { REGIONS, CHANNELS } from "../../constants";
+import { REGIONS, CHANNELS, GROUPINGS } from "../../constants";
 import "./GroupFilters.css";
 
 
 
 export default function GroupFilters({ filters, setFilters }) {
-
+  const GROUPINGS = ["Channel", "Region",];
   const toggleRegion = (region) => {
     const newRegions = new Set(filters.regions);
     newRegions.has(region) ? newRegions.delete(region) : newRegions.add(region);
@@ -22,96 +22,116 @@ export default function GroupFilters({ filters, setFilters }) {
   };
 
   return (
-    <aside className="filters-horizontal" aria-label="Filter panel">
-      {/* Group By */}
-      <div className="filter-section">
-        <label className="stat">Group By</label>
-        <select
-          value={filters.groupBy}
-          onChange={handleGroupByChange}
-          className="select"
-        >
-          <option value="none">No Grouping</option>
-          <option value="region">Region</option>
-          <option value="channel">Channel</option>
-          <option value="all">Region + Channel</option>
-        </select>
-      </div>
+    <aside className="filters-vertical" aria-label="Filter panel">
 
       {/* Search */}
-      <div className="filter-section">
-        <label className="stat">Search Good</label>
-        <div className="search-inline">
-          <input
-            type="text"
-            placeholder="e.g., Rice, Sardines, Sugar…"
-            value={filters.search}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          />
-          <button
-            className="btn"
-            onClick={() => setFilters({ ...filters, search: "" })}
-          >
-            Clear
-          </button>
+      <div className="top">
+        <div className="group">
+          <label className="stat">Search Good</label>
+          <div className="search" style={{ marginTop: "6px" }}>
+            <input
+              type="text"
+              placeholder="e.g., Rice, Sardines, Sugar…"
+              value={filters.search}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            />
+            <button
+              className="btn"
+              onClick={() => setFilters({ ...filters, search: "" })}
+            >
+              Clear
+            </button>
+          </div>
         </div>
+      </div>
+      
+
+      {/* Group By */}
+      <div className="filters-horizontal">
+        <div className="filter-section">
+          <div className="label-row">
+            <label className="stat">Group By</label>
+            <button
+              className="btn toggle"
+              onClick={() => setFilters({ ...filters, groupBy: new Set(REGIONS) })}
+            >
+              All
+            </button>
+          </div>
+          <div className="chips-row">
+            {GROUPINGS.map((r) => (
+              <label
+                key={r}
+                className={`chip ${filters.groupBy.has(r) ? "active" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={filters.regions.has(r)}
+                  onChange={() => toggleRegion(r)}
+                />
+                {r}
+              </label>
+            ))}
+          </div>
       </div>
 
-      {/* Regions */}
-      <div className="filter-section">
-        <div className="label-row">
-          <label className="stat">Regions</label>
-          <button
-            className="btn toggle"
-            onClick={() => setFilters({ ...filters, regions: new Set(REGIONS) })}
-          >
-            All
-          </button>
-        </div>
-        <div className="chips-row">
-          {REGIONS.map((r) => (
-            <label
-              key={r}
-              className={`chip ${filters.regions.has(r) ? "active" : ""}`}
+        {/* Regions */}
+        <div className="filter-section">
+          <div className="label-row">
+            <label className="stat">Regions</label>
+            <button
+              className="btn toggle"
+              onClick={() => setFilters({ ...filters, regions: new Set(REGIONS) })}
             >
-              <input
-                type="checkbox"
-                checked={filters.regions.has(r)}
-                onChange={() => toggleRegion(r)}
-              />
-              {r}
-            </label>
-          ))}
+              All
+            </button>
+          </div>
+          <div className="chips-row">
+            {REGIONS.map((r) => (
+              <label
+                key={r}
+                className={`chip ${filters.regions.has(r) ? "active" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={filters.regions.has(r)}
+                  onChange={() => toggleRegion(r)}
+                />
+                {r}
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Channels */}
-      <div className="filter-section">
-        <div className="label-row">
-          <label className="stat">Trade Channels</label>
-          <button
-            className="btn toggle"
-            onClick={() => setFilters({ ...filters, channels: new Set(CHANNELS) })}
-          >
-            All
-          </button>
-        </div>
-        <div className="chips-row">
-          {CHANNELS.map((c) => (
-            <label
-              key={c}
-              className={`chip ${filters.channels.has(c) ? "active" : ""}`}
+        {/* Channels */}
+        <div className="filter-section">
+          <div className="label-row">
+            <label className="stat">Trade Channels</label>
+            <button
+              className="btn toggle"
+              onClick={() => setFilters({ ...filters, channels: new Set(CHANNELS) })}
             >
-              <input
-                type="checkbox"
-                checked={filters.channels.has(c)}
-                onChange={() => toggleChannel(c)}
-              />
-              {c}
-            </label>
-          ))}
+              All
+            </button>
+          </div>
+          <div className="chips-row">
+            {CHANNELS.map((c) => (
+              <label
+                key={c}
+                className={`chip ${filters.channels.has(c) ? "active" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={filters.channels.has(c)}
+                  onChange={() => toggleChannel(c)}
+                />
+                {c}
+              </label>
+            ))}
+          </div>
         </div>
       </div>
+      
 
       {/* Legend */}
       <div className="filter-section legend">

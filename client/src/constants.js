@@ -14,5 +14,10 @@ export const CHANNELS = [
   "Convenience Store",
 ];
 
+export const GROUPINGS = [
+  "Region",
+  "Channel",
+];
+
 export const THRESH_YELLOW = 0;  
 export const THRESH_RED = 10;     

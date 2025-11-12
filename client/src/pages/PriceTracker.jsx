@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { REGIONS, CHANNELS } from "../constants"
+import { REGIONS, CHANNELS, GROUPINGS } from "../constants"
 import "./PriceTracker.css";
 import { mockApi } from "../mockDb";
 
@@ -16,7 +16,7 @@ function PriceTracker() {
     search: "",
     regions: new Set(REGIONS),
     channels: new Set(CHANNELS),
-    groupBy: "none"
+    groupBy: new Set(GROUPINGS)
   });
   const [data, setData] = useState([]);
   const [groupings, setGroupings] = useState("all");
