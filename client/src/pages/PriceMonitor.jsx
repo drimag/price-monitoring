@@ -23,7 +23,7 @@ function PriceMonitor() {
   useEffect(() => {
     mockApi.getGoods().then((allGoods) => {
 
-      let allRows = allGoods.flatMap((good) => aggregateGood(good, "region"));
+      let allRows = allGoods.flatMap((good) => aggregateGood(good));
       // now filter rows instead of goods
       if (filters.search) {
         const term = filters.search.toLowerCase();
