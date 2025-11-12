@@ -20,11 +20,10 @@ function PriceMonitor() {
   const [alerts, setAlerts] = useState([]);
   const [context, setContext] = useState("");
 
-
   useEffect(() => {
     mockApi.getGoods().then((allGoods) => {
 
-      let allRows = allGoods.flatMap((good) => aggregateGood(good));
+      let allRows = allGoods.flatMap((good) => aggregateGood(good, "region"));
       // now filter rows instead of goods
       if (filters.search) {
         const term = filters.search.toLowerCase();
@@ -75,10 +74,28 @@ function PriceMonitor() {
   );
 }
 
-function aggregateGood(good) {
+function aggregateGood(good, groupBy = "region-channel") {
   const groups = new Map();
+
   good.priceEntries.forEach((entry) => {
-    const key = `${entry.region}-${entry.channel}`;
+    let key;
+
+    switch (groupBy) {
+      case "all":
+        key = "all"; // all entries grouped together
+        break;
+      case "region":
+        key = entry.region;
+        break;
+      case "channel":
+        key = entry.channel;
+        break;
+      case "region-channel":
+      default:
+        key = `${entry.region}-${entry.channel}`;
+        break;
+    }
+
     if (!groups.has(key)) {
       groups.set(key, {
         region: entry.region,
@@ -89,6 +106,7 @@ function aggregateGood(good) {
         max: entry.actual,
       });
     }
+
     const g = groups.get(key);
     g.sum += entry.actual;
     g.count++;
@@ -97,7 +115,7 @@ function aggregateGood(good) {
   });
 
   const results = [];
-  groups.forEach((g) => {
+  groups.forEach((g, key) => {
     const avgActual = g.sum / g.count;
     const diff = avgActual - good.srp;
     const pct = (diff / good.srp) * 100;
@@ -106,10 +124,12 @@ function aggregateGood(good) {
     const maxDiffPCT = ((g.max - good.srp) / good.srp) * 100;
 
     results.push({
+      groupKey: key, // helpful for identifying what group this row represents
       name: good.name,
+      brand: good.brand,
       category: good.category,
-      region: g.region,
-      channel: g.channel,
+      region: groupBy === "channel" || groupBy === "all" ? "All Regions" : g.region,
+      channel: groupBy === "region" || groupBy === "all" ? "All Channels" : g.channel,
       srp: good.srp,
       actual: avgActual,
       diff,
@@ -120,7 +140,7 @@ function aggregateGood(good) {
       maxDiffPCT,
     });
   });
-  
+
   return results;
 }
 

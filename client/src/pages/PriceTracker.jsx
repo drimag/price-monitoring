@@ -9,12 +9,14 @@ import KpiCards from "../components/dashboard/KpiCards";
 import AlertsPanel from "../components/dashboard/AlertsPanel";
 import ChartPanel from "../components/dashboard/ChartPanel";
 import SummaryTable from "../components/dashboard/SummaryTable";
+import GroupFilters from "../components/dashboard/GroupFilters";
 
 function PriceTracker() {
   const [filters, setFilters] = useState({
     search: "",
     regions: new Set(REGIONS),
     channels: new Set(CHANNELS),
+    groupBy: "none"
   });
   const [data, setData] = useState([]);
   const [groupings, setGroupings] = useState("all");
@@ -48,7 +50,10 @@ function PriceTracker() {
   return (
     <>
       <Header />
-      <SummaryTable rows={data}/>
+      <main className="wrap main-layout">
+        <GroupFilters filters={filters}/>
+        <SummaryTable rows={data}/>
+      </main>
     </>
   );
 }
