@@ -51,7 +51,7 @@ function PriceTracker() {
     <>
       <Header />
       <main className="wrap main-layout">
-        <GroupFilters filters={filters}/>
+        <GroupFilters filters={filters} setFilters={setFilters}/>
         <SummaryTable rows={data}/>
       </main>
     </>

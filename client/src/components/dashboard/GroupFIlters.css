@@ -8,27 +8,36 @@
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   border: 1px solid var(--border);
+  width: 20%;
 }
 
-.filters-horizontal {
+/* .filters-horizontal {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 1rem;
-}
+  background: var(--panel);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid var(--border);
+  justify-content: space-between;
+} */
 
 .filter-section {
   display: flex;
   flex-direction: column;
+  max-width: 20%;
   gap: 0.4rem;
-  min-width: 180px;
+  padding-bottom: 1rem; 
 }
 
 .label-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 }
+.label-row label{ padding-right: 1rem;}
 
 .chips-row {
   display: flex;
@@ -63,12 +72,14 @@
   margin-right: 6px;
 }
 
+.search-section h2{ font-size:16px; margin:0 0 8px 0; color:var(--muted); letter-spacing:.3px; }
+
 .dot.g { background-color: green; }
 .dot.y { background-color: gold; }
 .dot.r { background-color: red; }
 
 /* Search Filter */
-.search{ width:100%; display:flex; gap:8px; }
+.search{ width:180px; display:flex; gap:8px; padding-bottom: 1rem;}
 .search input[type="text"]{ flex:1; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0c1229; color:var(--text); }
 .search button, .btn{ padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0c1229; color:var(--text); cursor:pointer; }
 .btn.toggle{ padding:6px 10px; font-size:12px; }
