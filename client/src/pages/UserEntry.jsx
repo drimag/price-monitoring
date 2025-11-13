@@ -9,6 +9,10 @@ import Header from "../components/Header";
 const PRODUCT_LOOKUP = {
   "49240290": "Soy Sauce",
   "49645422": "Soy Sauce",
+  "4801981120642": "Coke Zero 500mL",
+  "4801981127177": "Coke Regular 190mL",
+  "4801981112005": "Coke Regular 2L",
+  "4897036694275": "Monster",
 };
 
 export default function UserEntry() {
