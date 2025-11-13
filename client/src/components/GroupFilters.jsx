@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { REGIONS, CHANNELS, GROUPINGS } from "../../constants";
+import { REGIONS, CHANNELS, GROUPINGS } from "../constants";
 import "./GroupFilters.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
