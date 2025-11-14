@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { REGIONS, CHANNELS, GROUPINGS } from "../constants";
+import { REGIONS, CHANNELS, GROUPINGS } from "../../constants";
 import "./GroupFilters.css";
 import DatePicker from "react-datepicker";
+import DataRangePicker from "./DateRangePicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -134,13 +135,14 @@ export default function GroupFilters({ filters, setFilters }) {
         </div>
 
         <div>
-          <label className="stat label-row">Data Range</label>
+          <DataRangePicker/>
+          {/* <label className="stat label-row">Data Range</label>
           <DatePicker
             selected={selectedDate}
             onChange={(date) => setSelectedDate(date)}
             dateFormat="MM/yyyy"
             showMonthYearPicker
-          />
+          /> */}
         </div>
       </div>
     </aside>

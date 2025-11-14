@@ -9,7 +9,7 @@ import KpiCards from "../components/dashboard/KpiCards";
 import AlertsPanel from "../components/dashboard/AlertsPanel";
 import ChartPanel from "../components/dashboard/ChartPanel";
 import SummaryTable from "../components/dashboard/SummaryTable";
-import GroupFilters from "../components/GroupFilters";
+import GroupFilters from "../components/tracker/GroupFilters";
 
 function PriceTracker() {
   const [filters, setFilters] = useState({
