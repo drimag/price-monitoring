@@ -14,7 +14,7 @@ export const CHANNELS = [
   "Convenience Store",
 ];
 
-export const GROUPINGS = [
+export const AGGREGATIONLEVELS = [
   "Region",
   "Channel",
 ];

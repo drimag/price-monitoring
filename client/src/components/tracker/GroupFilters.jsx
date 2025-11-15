@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { REGIONS, CHANNELS, GROUPINGS } from "../../constants";
+import { REGIONS, CHANNELS, AGGREGATIONLEVELS } from "../../constants";
 import "./GroupFilters.css";
 import DatePicker from "react-datepicker";
 import DataRangePicker from "./DateRangePicker";
@@ -19,11 +19,10 @@ export default function GroupFilters({ filters, setFilters }) {
     setFilters({ ...filters, channels: newChannels });
   };
 
-  const toggleGroupBy = (grouping) => {
-    console.log("called togglegroupby");
-    const newGroupings = new Set(filters.groupBy);
-    newGroupings.has(grouping) ? newGroupings.delete(grouping) : newGroupings.add(grouping);
-    setFilters({ ...filters, groupBy: e.target.value });
+  const toggleAggLevel = (aggregationLevel) => {
+    const newAggLevel = new Set(filters.aggregationLevels);
+    newAggLevel.has(aggregationLevel) ? newAggLevel.delete(aggregationLevel) : newAggLevel.add(aggregationLevel);
+    setFilters({ ...filters, aggregationLevels: newAggLevel });
   };
 
   return (
@@ -55,24 +54,24 @@ export default function GroupFilters({ filters, setFilters }) {
         <div className="filters-vertical filter-section">
           {/* Group By */}
           <div className="label-row">
-            <label className="stat">Group By</label>
+            <label className="stat">Aggregate By</label>
             <button
               className="btn toggle"
-              onClick={() => setFilters({ ...filters, groupBy: new Set(GROUPINGS) })}
+              onClick={() => setFilters({ ...filters, aggregationLevel: new Set(AGGREGATIONLEVELS) })}
             >
               All
             </button>
           </div>
           <div className="chips-row">
-            {GROUPINGS.map((r) => (
+            {AGGREGATIONLEVELS.map((r) => (
               <label
                 key={r}
-                className={`chip ${filters.groupBy.has(r) ? "active" : ""}`}
+                className={`chip ${filters.aggregationLevels.has(r) ? "active" : ""}`}
               >
                 <input
                   type="checkbox"
-                  checked={filters.groupBy.has(r)}
-                  onChange={() => toggleGroupBy(r)}
+                  checked={filters.aggregationLevels.has(r)}
+                  onChange={() => toggleAggLevel(r)}
                 />
                 {r}
               </label>

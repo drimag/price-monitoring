@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { REGIONS, CHANNELS, GROUPINGS } from "../constants"
+import { REGIONS, CHANNELS, AGGREGATIONLEVELS } from "../constants"
 import "./PriceTracker.css";
 import { mockApi } from "../mockDb";
 
@@ -16,34 +16,29 @@ function PriceTracker() {
     search: "",
     regions: new Set(REGIONS),
     channels: new Set(CHANNELS),
-    groupBy: new Set(GROUPINGS)
+    aggregationLevels: new Set(AGGREGATIONLEVELS)
   });
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     mockApi.getGoods().then((allGoods) => {
-      let allRows = allGoods.flatMap((good) => aggregateGood(good));
-
+      let allRows = allGoods.flatMap((good) => aggregateGood(good, filters.aggregationLevels));
+      console.log(allRows);
       if (filters.search) {
         const term = filters.search.toLowerCase();
         allRows = allRows.filter((row) =>
           row.name.toLowerCase().includes(term)
         );
       }
-      if (filters.regions && filters.regions.size > 0 && groupings != "channel" && groupings != "all") {
+      if (filters.regions && filters.regions.size > 0 && filters.aggregationLevels.has("Region")) { // ADD AGGREGATION LEVEL FILTERS
         allRows = allRows.filter((row) => filters.regions.has(row.region));
       }
-      if (filters.channels && filters.channels.size > 0 && groupings != "region" && groupings != "all") {
+      if (filters.channels && filters.channels.size > 0 && filters.aggregationLevels.has("Channel")) {
         allRows = allRows.filter((row) => filters.channels.has(row.channel));
       }
 
       setData(allRows);
-
-      const aboveSRP = allRows.filter((i) => i.pct > 0).sort((a, b) => b.pct - a.pct);
-      const topAlerts = allRows.slice(0, 5).map((item, idx) => ({ rank: idx + 1, ...item }));
-      setAlerts(topAlerts);
-      setContext(`${aboveSRP.length} items above SRP in current view`);
     });
   }, [filters]);
 
@@ -58,27 +53,26 @@ function PriceTracker() {
   );
 }
 
-function aggregateGood(good) {
+function aggregateGood(good, aggregationLevels) {
   const groups = new Map();
 
   good.priceEntries.forEach((entry) => {
     let key;
 
-    switch (filters.groupBy) {
-      case "all":
-        key = "all"; // all entries grouped together
-        break;
-      case "region":
-        key = entry.region;
-        break;
-      case "channel":
-        key = entry.channel;
-        break;
-      case "region-channel":
-      default:
-        key = `${entry.region}-${entry.channel}`;
-        break;
+    const hasRegion = aggregationLevels.has("Region");
+    const hasChannel = aggregationLevels.has("Channel");
+
+    if (hasRegion && hasChannel) {
+      key = `${entry.region}-${entry.channel}`;
+    } else if (hasRegion && !hasChannel) {
+      key = entry.region;
+    } else if (hasChannel && !hasRegion) {
+      key = entry.channel;
+    } else {
+      key = "all";
     }
+
+    console.log("current key: " + key);
 
     if (!groups.has(key)) {
       groups.set(key, {
@@ -112,8 +106,8 @@ function aggregateGood(good) {
       name: good.name,
       brand: good.brand,
       category: good.category,
-      region: groupBy === "channel" || groupBy === "all" ? "Nationwide" : g.region,
-      channel: groupBy === "region" || groupBy === "all" ? "All Channels" : g.channel,
+      region: !aggregationLevels.has("Region") ? "Nationwide" : g.region, // need to rework based on definition
+      channel: !aggregationLevels.has("Channel") ? "All Channels" : g.channel,
       srp: good.srp,
       actual: avgActual,
       diff,
