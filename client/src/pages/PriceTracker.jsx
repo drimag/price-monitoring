@@ -19,11 +19,11 @@ function PriceTracker() {
     groupBy: new Set(GROUPINGS)
   });
   const [data, setData] = useState([]);
-  const [groupings, setGroupings] = useState("all");
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     mockApi.getGoods().then((allGoods) => {
-      let allRows = allGoods.flatMap((good) => aggregateGood(good, groupings));
+      let allRows = allGoods.flatMap((good) => aggregateGood(good));
 
       if (filters.search) {
         const term = filters.search.toLowerCase();
@@ -58,13 +58,13 @@ function PriceTracker() {
   );
 }
 
-function aggregateGood(good, groupBy = "region-channel") {
+function aggregateGood(good) {
   const groups = new Map();
 
   good.priceEntries.forEach((entry) => {
     let key;
 
-    switch (groupBy) {
+    switch (filters.groupBy) {
       case "all":
         key = "all"; // all entries grouped together
         break;

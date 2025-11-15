@@ -7,7 +7,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 
 export default function GroupFilters({ filters, setFilters }) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const toggleRegion = (region) => {
     const newRegions = new Set(filters.regions);
     newRegions.has(region) ? newRegions.delete(region) : newRegions.add(region);
@@ -20,7 +19,10 @@ export default function GroupFilters({ filters, setFilters }) {
     setFilters({ ...filters, channels: newChannels });
   };
 
-  const handleGroupByChange = (e) => {
+  const toggleGroupBy = (grouping) => {
+    console.log("called togglegroupby");
+    const newGroupings = new Set(filters.groupBy);
+    newGroupings.has(grouping) ? newGroupings.delete(grouping) : newGroupings.add(grouping);
     setFilters({ ...filters, groupBy: e.target.value });
   };
 
@@ -50,13 +52,13 @@ export default function GroupFilters({ filters, setFilters }) {
 
 
       <div className="filters-horizontal">
-        {/* Group By */}
-        <div className="filter-section">
+        <div className="filters-vertical filter-section">
+          {/* Group By */}
           <div className="label-row">
             <label className="stat">Group By</label>
             <button
               className="btn toggle"
-              onClick={() => setFilters({ ...filters, groupBy: new Set(REGIONS) })}
+              onClick={() => setFilters({ ...filters, groupBy: new Set(GROUPINGS) })}
             >
               All
             </button>
@@ -69,13 +71,15 @@ export default function GroupFilters({ filters, setFilters }) {
               >
                 <input
                   type="checkbox"
-                  checked={filters.regions.has(r)}
-                  onChange={() => toggleRegion(r)}
+                  checked={filters.groupBy.has(r)}
+                  onChange={() => toggleGroupBy(r)}
                 />
                 {r}
               </label>
             ))}
           </div>
+          
+          <DataRangePicker/>
         </div>
 
         {/* Regions */}
@@ -132,17 +136,6 @@ export default function GroupFilters({ filters, setFilters }) {
               </label>
             ))}
           </div>
-        </div>
-
-        <div>
-          <DataRangePicker/>
-          {/* <label className="stat label-row">Data Range</label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            dateFormat="MM/yyyy"
-            showMonthYearPicker
-          /> */}
         </div>
       </div>
     </aside>

@@ -2,16 +2,9 @@
   display: flex;
   flex-direction: column; 
   align-items: flex-start;
-  gap: 1rem;
-  background: var(--panel);
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border: 1px solid var(--border);
-  width: 20%;
 }
 
-/* .filters-horizontal {
+.filters-horizontal {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -21,15 +14,15 @@
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   border: 1px solid var(--border);
-  justify-content: space-between;
-} */
+}
 
 .filter-section {
   display: flex;
   flex-direction: column;
-  max-width: 20%;
+  max-width: 340px;
   gap: 0.4rem;
-  padding-bottom: 1rem; 
+  align-items: flex-start;
+  padding-right: 2rem;
 }
 
 .label-row {
@@ -43,6 +36,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+  width: fit-content;
+  max-width: 285px;
 }
 
 .search-inline {
@@ -84,3 +79,18 @@
 .search button, .btn{ padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#0c1229; color:var(--text); cursor:pointer; }
 .btn.toggle{ padding:6px 10px; font-size:12px; }
 .btn.primary{ background:linear-gradient(180deg,#2341b6,#1b2d84); border-color:#2a45b3; }
+
+/* ---- DATEPICKER INPUT ---- */
+.datepicker-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #0c1229;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.datepicker-input::placeholder {
+  color: #aaa;
+}
